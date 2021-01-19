@@ -1,0 +1,5 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:0.0.1', '.' ]
+images:
+  - 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:0.0.1'
