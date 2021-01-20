@@ -1,5 +1,19 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:0.0.1', '.' ]
+    args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA', '.' ]
+  - name: 'alpine/helm'
+    args:
+      - 'upgrade'
+      - 'what-time-is-it'
+      - '-i'
+      - '--namespace'
+      - 'default'
+      - '-f'
+      - 'envs/$_ENVIRONMENT/values.yaml'
+      - '--set'
+      - 'image.tag=$SHORT_SHA'
+      - 'chart'
 images:
-  - 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:0.0.1'
+  - 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA'
+substitutions:
+  _ENVIRONMENT: 'dev'
