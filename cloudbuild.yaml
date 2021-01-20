@@ -1,6 +1,13 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA', '.' ]
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - cluster-info
+    env:
+      - CLOUDSDK_COMPUTE_REGION=europe-west4
+      - CLOUDSDK_CONTAINER_CLUSTER=bux-assignment-cluster
+      - KUBECONFIG=/workspace/.kube/config
   - name: 'alpine/helm'
     args:
       - 'upgrade'
