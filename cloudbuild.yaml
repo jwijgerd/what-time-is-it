@@ -1,6 +1,6 @@
 steps:
   - id: 'prepare gke cluster access'
-    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:318.0.0'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:324.0.0'
     entrypoint: '/bin/bash'
     args:
       - '-c'
@@ -9,7 +9,7 @@ steps:
         if [[ ! -z "$(gcloud container clusters list --project $PROJECT_ID --format='value(name)' | grep bux-assignment-cluster)" ]]; then
           echo "Found running cluster"
           echo "Adding Cloud Build ip address $(curl -s ifconfig.me) to the master-authorized-networks"
-          gcloud container clusters update kafka-eu-w4 \
+          gcloud container clusters update bux-assignment-cluster \
               --project $PROJECT_ID \
               --region europe-west4 \
               --enable-master-authorized-networks \
