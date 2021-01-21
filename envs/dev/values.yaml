@@ -52,7 +52,7 @@ ingress:
       hosts:
         - wtii.asg1.casual-trading.com
 
-resources: {}
+resources:
   limits:
     cpu: 2
     memory: 512Mi
