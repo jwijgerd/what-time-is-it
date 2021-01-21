@@ -1,14 +1,33 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'prepare gke cluster access'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:318.0.0'
+    entrypoint: '/bin/bash'
+    args:
+      - '-c'
+      - |
+        echo "cloudbuild_ip = $(curl -s ifconfig.me)"
+        if [[ ! -z "$(gcloud container clusters list --project $PROJECT_ID --format='value(name)' | grep bux-assignment-cluster)" ]]; then
+          echo "Found running cluster"
+          echo "Adding Cloud Build ip address $(curl -s ifconfig.me) to the master-authorized-networks"
+          gcloud container clusters update kafka-eu-w4 \
+              --project $PROJECT_ID \
+              --region europe-west4 \
+              --enable-master-authorized-networks \
+              --master-authorized-networks $_LOCAL_ADDRESS/32,$(curl -s ifconfig.me)/32
+        fi
+  - id: 'build docker image'
+    name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA', '.' ]
-  - name: gcr.io/cloud-builders/kubectl
+  - id: 'configure kubectl'
+    name: gcr.io/cloud-builders/kubectl
     args:
       - cluster-info
     env:
       - CLOUDSDK_COMPUTE_REGION=europe-west4
       - CLOUDSDK_CONTAINER_CLUSTER=bux-assignment-cluster
       - KUBECONFIG=/workspace/.kube/config
-  - name: 'alpine/helm'
+  - id: 'deploy helm chart'
+    name: 'alpine/helm'
     args:
       - 'upgrade'
       - 'what-time-is-it'
@@ -19,8 +38,11 @@ steps:
       - 'envs/$_ENVIRONMENT/values.yaml'
       - '--set'
       - 'image.tag=$SHORT_SHA'
+      - '--kubeconfig'
+      - '/workspace/.kube/config'
       - 'chart'
 images:
   - 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA'
 substitutions:
   _ENVIRONMENT: 'dev'
+  _LOCAL_ADDRESS: '35.204.42.81'
