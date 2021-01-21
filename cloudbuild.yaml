@@ -27,7 +27,7 @@ steps:
       - CLOUDSDK_CONTAINER_CLUSTER=bux-assignment-cluster
       - KUBECONFIG=/workspace/.kube/config
   - id: 'deploy helm chart'
-    name: 'alpine/helm'
+    name: 'alpine/helm:3.5.0'
     args:
       - 'upgrade'
       - 'what-time-is-it'
