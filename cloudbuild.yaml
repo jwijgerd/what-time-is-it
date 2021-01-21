@@ -18,6 +18,9 @@ steps:
   - id: 'build docker image'
     name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA', '.' ]
+  - id: 'push docker image'
+    name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA']
   - id: 'configure kubectl'
     name: gcr.io/cloud-builders/kubectl
     args:
@@ -41,8 +44,6 @@ steps:
       - '--kubeconfig'
       - '/workspace/.kube/config'
       - 'chart'
-images:
-  - 'europe-west4-docker.pkg.dev/$PROJECT_ID/assignment-repo/what-time-is-it:$SHORT_SHA'
 substitutions:
   _ENVIRONMENT: 'dev'
   _LOCAL_ADDRESS: '35.204.42.81'
